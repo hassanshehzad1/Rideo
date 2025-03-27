@@ -11,7 +11,8 @@ const blackListSchema = new mongoose.Schema({
         default: Date.now,
         expires: 24 * 60 * 60
     }
-})
+},
+    { timestamps: true })
 
 const blackList = mongoose.model("blackList", blackListSchema);
 export default blackList;

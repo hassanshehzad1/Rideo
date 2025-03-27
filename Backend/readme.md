@@ -339,3 +339,353 @@ router.get("/profile", protect, profile);
 
 - Ensure the `JWT_SECRET` environment variable is set in the `.env` file.
 - Tokens are blacklisted upon logout to prevent reuse.
+
+# Captain API Documentation
+
+## Endpoint: `/api/v1/captains/register`
+
+### Description
+
+This endpoint is used to register a new captain in the system. It validates the input data and creates a new captain if the data is valid and the email is not already registered.
+
+### Method
+
+`POST`
+
+### Request Body
+
+The request body must be in JSON format and include the following fields:
+
+| Field                  | Type   | Required | Description                                                        |
+| ---------------------- | ------ | -------- | ------------------------------------------------------------------ |
+| `fullName`             | Object | Yes      | Contains the captain's first and last name.                        |
+| `fullName.firstName`   | String | Yes      | The first name of the captain (minimum 3 characters).              |
+| `fullName.lastName`    | String | Yes      | The last name of the captain (minimum 3 characters).               |
+| `email`                | String | Yes      | The captain's email address (must be valid).                       |
+| `password`             | String | Yes      | The captain's password (minimum 8 characters).                     |
+| `vehicle`              | Object | Yes      | Contains the captain's vehicle details.                            |
+| `vehicle.type`         | String | Yes      | The type of the vehicle (must be one of `car`, `bike`, or `auto`). |
+| `vehicle.licensePlate` | String | Yes      | The license plate number of the vehicle.                           |
+| `vehicle.model`        | String | Yes      | The model of the vehicle.                                          |
+| `vehicle.color`        | String | Yes      | The color of the vehicle.                                          |
+| `vehicle.capacity`     | Number | Yes      | The capacity of the vehicle (minimum 1).                           |
+
+### Example Request
+
+```json
+{
+  "fullName": {
+    "firstName": "John",
+    "lastName": "Doe"
+  },
+  "email": "john.doe@example.com",
+  "password": "securepassword123",
+  "vehicle": {
+    "type": "car",
+    "licensePlate": "ABC123",
+    "model": "Toyota Corolla",
+    "color": "Blue",
+    "capacity": 4
+  }
+}
+```
+
+### Responses
+
+#### Success
+
+- **Status Code:** `201 Created`
+- **Response Body:**
+  ```json
+  {
+    "message": "Captain registered successfully",
+    "success": true,
+    "token": "your-authentication-token"
+  }
+  ```
+
+#### Validation Error
+
+- **Status Code:** `400 Bad Request`
+- **Response Body:**
+  ```json
+  {
+    "success": false,
+    "message": "Validation failed",
+    "errors": [
+      {
+        "msg": "Please provide a valid email",
+        "param": "email",
+        "location": "body"
+      }
+    ]
+  }
+  ```
+
+#### Captain Already Exists
+
+- **Status Code:** `400 Bad Request`
+- **Response Body:**
+  ```json
+  {
+    "success": false,
+    "message": "Captain already registered with this email"
+  }
+  ```
+
+### Notes
+
+- Ensure that the `JWT_SECRET` environment variable is set in the `.env` file for token generation.
+- Passwords are hashed before being stored in the database.
+
+## Endpoint: `/api/v1/captains/login`
+
+### Description
+
+This endpoint is used to authenticate a captain and provide a JWT token upon successful login.
+
+### Method
+
+`POST`
+
+### Request Body
+
+The request body must be in JSON format and include the following fields:
+
+| Field      | Type   | Required | Description                                    |
+| ---------- | ------ | -------- | ---------------------------------------------- |
+| `email`    | String | Yes      | The captain's email address (must be valid).   |
+| `password` | String | Yes      | The captain's password (minimum 8 characters). |
+
+### Example Request
+
+```json
+{
+  "email": "captain.doe@example.com",
+  "password": "securepassword123"
+}
+```
+
+### Responses
+
+#### Success
+
+- **Status Code:** `200 OK`
+- **Response Body:**
+  ```json
+  {
+    "message": "Captain logged in successfully",
+    "success": true,
+    "token": "your-authentication-token",
+    "captain": {
+      "id": "captain-id",
+      "email": "captain.doe@example.com",
+      "fullName": {
+        "firstName": "John",
+        "lastName": "Doe"
+      }
+    }
+  }
+  ```
+
+#### Validation Error
+
+- **Status Code:** `400 Bad Request`
+- **Response Body:**
+  ```json
+  {
+    "success": false,
+    "message": "Validation failed",
+    "errors": [
+      {
+        "msg": "Please provide a valid email",
+        "param": "email",
+        "location": "body"
+      }
+    ]
+  }
+  ```
+
+#### Authentication Error
+
+- **Status Code:** `401 Unauthorized`
+- **Response Body:**
+  ```json
+  {
+    "success": false,
+    "message": "Invalid credentials, email and password is incorrect"
+  }
+  ```
+
+---
+
+## Endpoint: `/api/v1/captains/logout`
+
+### Description
+
+This endpoint is used to log out the authenticated captain by blacklisting their JWT token.
+
+### Method
+
+`GET`
+
+### Headers
+
+| Header          | Value            | Required | Description                                 |
+| --------------- | ---------------- | -------- | ------------------------------------------- |
+| `Authorization` | Bearer `<token>` | Yes      | The JWT token of the authenticated captain. |
+
+### Responses
+
+#### Success
+
+- **Status Code:** `200 OK`
+- **Response Body:**
+  ```json
+  {
+    "success": true,
+    "message": "Logout successfully"
+  }
+  ```
+
+#### Authentication Error
+
+- **Status Code:** `401 Unauthorized`
+- **Response Body:**
+  ```json
+  {
+    "success": false,
+    "message": "Not authorized, no token founded"
+  }
+  ```
+
+---
+
+## Endpoint: `/api/v1/captains/profile`
+
+### Description
+
+This endpoint is used to retrieve the profile information of the authenticated captain.
+
+### Method
+
+`GET`
+
+### Headers
+
+| Header          | Value            | Required | Description                                 |
+| --------------- | ---------------- | -------- | ------------------------------------------- |
+| `Authorization` | Bearer `<token>` | Yes      | The JWT token of the authenticated captain. |
+
+### Responses
+
+#### Success
+
+- **Status Code:** `200 OK`
+- **Response Body:**
+  ```json
+  {
+    "success": true,
+    "message": "Captain profile",
+    "captain": {
+      "id": "captain-id",
+      "email": "captain.doe@example.com",
+      "fullName": {
+        "firstName": "John",
+        "lastName": "Doe"
+      },
+      "vehicle": {
+        "type": "car",
+        "licensePlate": "ABC123",
+        "model": "Toyota Corolla",
+        "color": "Blue",
+        "capacity": 4
+      }
+    }
+  }
+  ```
+
+#### Authentication Error
+
+- **Status Code:** `401 Unauthorized`
+- **Response Body:**
+  ```json
+  {
+    "success": false,
+    "message": "Not authorized, no token founded"
+  }
+  ```
+
+---
+
+## Middleware: `captainProtect`
+
+### Description
+
+The `captainProtect` middleware is used to secure captain-specific routes by verifying the JWT token provided by the captain. It ensures that only authenticated captains can access protected endpoints.
+
+### Usage
+
+This middleware should be applied to any route that requires captain authentication.
+
+### Functionality
+
+1. Checks for the presence of a token in the `Authorization` header or cookies.
+2. Verifies the token using the `JWT_SECRET` environment variable.
+3. Checks if the token is blacklisted (e.g., after logout).
+4. Fetches the captain associated with the token and attaches it to the `req` object.
+
+### Example
+
+```javascript
+import { captainProtect } from "../middleware/auth.middleware.js";
+
+router.get("/profile", captainProtect, profile);
+```
+
+### Errors
+
+#### No Token Found
+
+- **Status Code:** `401 Unauthorized`
+- **Response Body:**
+  ```json
+  {
+    "message": "Not authorized, no token founded"
+  }
+  ```
+
+#### Token Blacklisted
+
+- **Status Code:** `401 Unauthorized`
+- **Response Body:**
+  ```json
+  {
+    "message": "Unauthorized"
+  }
+  ```
+
+#### Token Validation Failed
+
+- **Status Code:** `401 Unauthorized`
+- **Response Body:**
+  ```json
+  {
+    "message": "Not authorized, Token validation failed"
+  }
+  ```
+
+#### Captain Not Found
+
+- **Status Code:** `401 Unauthorized`
+- **Response Body:**
+  ```json
+  {
+    "message": "Not authorized, token not found"
+  }
+  ```
+
+### Notes
+
+- Ensure the `JWT_SECRET` environment variable is set in the `.env` file.
+- Tokens are blacklisted upon logout to prevent reuse.
