@@ -1,6 +1,6 @@
 import { validationResult } from "express-validator";
 import { createUser, loginUser } from "../services/user.service.js";
-
+import blackListToken  from "../models/blacklist.model.js";
 export const register = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({
@@ -16,6 +16,15 @@ export const register = async (req, res, next) => {
             firstName: fullName.firstName, lastName: fullName.lastName, email, password
         })
 
+
+        // Setting cookies
+        res.cookie = ("token", token, {
+            httpOnly: false,
+            secure: process.env.NODE_ENV === "development",
+            sameSize: "Strict",
+            maxAge: 24 * 60 * 60 * 1000, // 20 hours
+            path: "/"
+        })
         return res.status(201).json({
             message: "User created successfully",
             success: true,
@@ -45,6 +54,19 @@ export const login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
         const { user, token } = await loginUser({ email, password });
+
+
+
+
+
+        // Setting cookies
+        res.cookie("token", token, {
+            httpOnly: false,
+            secure: process.env.NODE_ENV === "development",
+            sameSize: "Strict",
+            maxAge: 24 * 60 * 60 * 1000, // 20 hours
+            path: "/"
+        })
         return res.status(200).json({
             success: true,
             message: "Login Successfully",
@@ -57,4 +79,27 @@ export const login = async (req, res, next) => {
             message: err.message
         })
     }
+}
+
+
+//! Profile controller
+
+export const profile = async (req, res, next) => {
+    return res.status(200).json({
+        success: true,
+        message: "User profile",
+        user: req.user
+    })
+}
+
+
+//! Logout controller
+export const logout = async (req, res, next) => {
+    res.clearCookie("token");
+    const token = req.cookies?.token || req.headers?.authorization?.split(" ")[1];
+    await blackListToken.create({ token });
+    return res.status(200).json({
+        success: true,
+        message: "Logout successfully"
+    })
 }
