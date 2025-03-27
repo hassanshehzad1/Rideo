@@ -82,3 +82,87 @@ The request body must be in JSON format and include the following fields:
 
 - Ensure that the `JWT_SECRET` environment variable is set in the `.env` file for token generation.
 - Passwords are hashed before being stored in the database.
+
+## Endpoint: `/api/v1/users/login`
+
+### Description
+
+This endpoint is used to authenticate a user and provide a JWT token upon successful login.
+
+### Method
+
+`POST`
+
+### Request Body
+
+The request body must be in JSON format and include the following fields:
+
+| Field      | Type   | Required | Description                                 |
+| ---------- | ------ | -------- | ------------------------------------------- |
+| `email`    | String | Yes      | The user's email address (must be valid).   |
+| `password` | String | Yes      | The user's password (minimum 8 characters). |
+
+### Example Request
+
+```json
+{
+  "email": "john.doe@example.com",
+  "password": "securepassword123"
+}
+```
+
+### Responses
+
+#### Success
+
+- **Status Code:** `200 OK`
+- **Response Body:**
+  ```json
+  {
+    "message": "Login Successfully",
+    "success": true,
+    "token": "your-authentication-token",
+    "user": {
+      "id": "user-id",
+      "email": "john.doe@example.com",
+      "fullName": {
+        "firstName": "John",
+        "lastName": "Doe"
+      }
+    }
+  }
+  ```
+
+#### Validation Error
+
+- **Status Code:** `400 Bad Request`
+- **Response Body:**
+  ```json
+  {
+    "success": false,
+    "message": "Validation Failed",
+    "errors": [
+      {
+        "msg": "Please provide a valid email",
+        "param": "email",
+        "location": "body"
+      }
+    ]
+  }
+  ```
+
+#### Authentication Error
+
+- **Status Code:** `401 Unauthorized`
+- **Response Body:**
+  ```json
+  {
+    "success": false,
+    "message": "Invalid credentials, email and password is incorrect"
+  }
+  ```
+
+### Notes
+
+- Ensure that the `JWT_SECRET` environment variable is set in the `.env` file for token generation.
+- Passwords are securely compared using hashing.

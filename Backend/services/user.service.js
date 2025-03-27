@@ -19,3 +19,15 @@ export const createUser = async ({ firstName, lastName, email, password }) => {
 
 }
 
+export const loginUser = async ({ email, password }) => {
+
+    const user = await UserModel.findOne({ email }).select("+password");
+    if (!user) throw new Error("Invalid credentials, email and password is incorrect");
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) throw new Error("Invalid credentials, email and password is incorrect");
+
+    const token = await user.authenticateToken();
+    return { user, token }
+
+}

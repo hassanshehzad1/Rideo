@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-
+        lowercase: true
 
     },
     password: {
@@ -43,17 +43,18 @@ const userSchema = new mongoose.Schema({
 
 // Hashing password before storing it
 userSchema.pre("save", async function (next) {
-    if (!this.isModified("password")) return next()  // If password is not changes
-
-    const salt = await bcrypt.genSalt(12) // Generating salt
-    this.password = await bcrypt.hash(this.password, salt) // Update password
+    if (!this.isModified("password")) {
+        return next();
+    }
+    const salt = await bcrypt.genSalt(12);
+    this.password = await bcrypt.hash(this.password, salt);
     next();
-})
+});
 
 
 // Generating token
 userSchema.methods.authenticateToken = async function () {
-    const token = jwt.sign({ _id: this._id, email: this._email }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ _id: this._id, email: this.email }, process.env.JWT_SECRET, {
         expiresIn: '20h'
     })
     return token;
@@ -62,7 +63,7 @@ userSchema.methods.authenticateToken = async function () {
 
 // Compare password
 userSchema.methods.comparePassword = async function (pass) {
-    return await bcrypt.compare(this.password, pass)
+    return await bcrypt.compare(pass, this.password)
 }
 
 const User = mongoose.model("User", userSchema);
