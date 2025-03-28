@@ -1,14 +1,32 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import logo from "../assets/Images/logo.png"; // Fixed logo import
 import { Link, useNavigate } from 'react-router-dom';
-
+import { UserDataContext } from '../context/UserContext';
+import { toast } from 'sonner';
+import axios from 'axios';
 const UserLogin = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const navigate = useNavigate(); // For redirect after successful login
 
+    const {  setUser } = useContext(UserDataContext);
     const onSubmit = async (data) => {
-        console.log("Form Submitted:", data);
+
+        try {
+            const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/v1/users/login`, data);
+
+            if (res?.data?.success) {
+                toast.success(res?.data?.message);
+                setUser(res?.data?.user);
+                localStorage.setItem("token", res?.data?.token); // Store token in local storage
+                localStorage.setItem("user", JSON.stringify(res?.data?.user)); // Store user data in local storage
+                navigate("/home"); // Redirect to home page after successful login
+            }
+
+        } catch (err) {
+            console.error(err?.response?.data?.message);
+            toast.error(err?.response?.data?.message || "Something went wrong!");
+        }
 
     };
 

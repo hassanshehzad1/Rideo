@@ -1,15 +1,46 @@
-import React from 'react'
+import React, { useContext } from 'react'
 
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from "../assets/Images/logo.png"; // Adjust the path as necessary
+
+import { UserDataContext } from '../context/UserContext.jsx'
+import axios from 'axios';
+import { toast } from 'sonner'
 const UserSign = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const navigate = useNavigate(); // For redirect after successful login
 
+    const { setUser } = useContext(UserDataContext);
+
     const onSubmit = async (data) => {
         console.log("Form Submitted:", data);
+        const formData = {
+            fullName: {
+                firstName: data.firstName,
+                lastName: data.lastName
+            },
+            email: data.email,
+            password: data.password
+        }
+        console.log(formData);
 
+        try {
+
+            const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/v1/users/register`, formData);
+            console.log(res.data);
+            if (res?.data?.success) {
+                console.log("User registered successfully:", res.data);
+                toast.success(res?.data?.message);
+                setUser(res?.data?.user);
+                localStorage.setItem("token", res?.data?.token); // Store token in local storage
+                localStorage.setItem("user", JSON.stringify(res?.data?.user)); // Store user data in local storage
+                navigate("/home"); // Redirect to home page after successful registration
+            }
+        } catch (err) {
+            console.error(err?.response?.data?.message)
+            toast.error(err?.response?.data?.message);
+        }
     };
 
     return (
@@ -103,7 +134,7 @@ const UserSign = () => {
                 <p className="text-center mt-4">
                     Already have an account?{' '}
                     <Link to="/users/login" className="text-blue-500 hover:underline">
-                        Sign in as user
+                        Continue  as user
                     </Link>
                 </p>
             </div>

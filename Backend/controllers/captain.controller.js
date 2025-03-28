@@ -31,6 +31,8 @@ export const register = async (req, res) => {
             secure: process.env.NODE_ENV === "development",
             maxAge: 24 * 60 * 60 * 1000, // 24 hours
         });
+        return res.status(200).json({ success: true, message: "Captain logged in successfully", captain, token });
+
 
     } catch (err) {
         console.error(`Error: ${err}`);

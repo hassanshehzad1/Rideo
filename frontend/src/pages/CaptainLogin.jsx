@@ -2,6 +2,8 @@ import React from 'react'
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from "../assets/Images/logo.png"; // Adjust the path as necessary
+import axios from 'axios';
+import { toast } from 'sonner';
 const CaptainLogin = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const navigate = useNavigate(); // For redirect after successful login
@@ -9,6 +11,20 @@ const CaptainLogin = () => {
     const onSubmit = async (data) => {
         console.log("Form Submitted:", data);
 
+        try {
+
+            const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/v1/captains/login`, data);
+            if (res.data.success) {
+                localStorage.setItem("token", res.data.token);
+                localStorage.setItem("captain", JSON.stringify(res.data.captain));
+                toast.success(res.data.message);
+                navigate("/captains/home");
+            }
+        } catch (err) {
+            console.error(err?.response?.data?.message);
+            toast.error(err?.response?.data?.message);
+
+        }
     };
 
     return (
