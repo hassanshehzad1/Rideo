@@ -91,6 +91,116 @@ Rideo is a MERN stack application that provides a platform for users and captain
 
 ---
 
+### User Home Page
+
+The User Home page is the main interface for users to find and book rides. It integrates multiple components to provide a seamless experience.
+
+#### Components Overview
+
+1. **LocationSearchPanel**:
+
+   - **File**: `src/components/LocationSearchPanel.jsx`
+   - **Description**: Allows users to select a pickup location and destination.
+   - **Example Usage**:
+     ```jsx
+     <LocationSearchPanel
+       setPanelOpen={setPanelOpen}
+       setVehiclePanel={setVehiclePanel}
+     />
+     ```
+
+2. **VehicleSuggest**:
+
+   - **File**: `src/components/VehicleSuggest.jsx`
+   - **Description**: Displays a list of available vehicles with details like type, capacity, and estimated fare.
+   - **Example Usage**:
+     ```jsx
+     <VehicleSuggest
+       setConfirmPanel={setConfirmPanel}
+       setVehiclePanel={setVehiclePanel}
+     />
+     ```
+
+3. **ConfirmPanel**:
+
+   - **File**: `src/components/ConfirmPanel.jsx`
+   - **Description**: Allows users to confirm their ride selection.
+   - **Example Usage**:
+     ```jsx
+     <ConfirmPanel
+       setConfirmPanel={setConfirmPanel}
+       setVehicleFound={setVehicleFound}
+     />
+     ```
+
+4. **DriverLook**:
+
+   - **File**: `src/components/DriverLook.jsx`
+   - **Description**: Displays driver and vehicle details after a ride is confirmed.
+   - **Example Usage**:
+     ```jsx
+     <DriverLook setVehicleFound={setVehicleFound} />
+     ```
+
+5. **WaitDriver**:
+   - **File**: `src/components/WaitDriver.jsx`
+   - **Description**: Indicates the waiting status for the driver to arrive.
+   - **Example Usage**:
+     ```jsx
+     <WaitDriver setWaitDriver={setWaitDriver} />
+     ```
+
+#### Example Integration in `Home.jsx`
+
+The following example demonstrates how these components are integrated into the `Home` page:
+
+```jsx
+// filepath: src/pages/Home.jsx
+import React, { useState, useRef } from "react";
+import LocationSearchPanel from "../components/LocationSearchPanel";
+import VehicleSuggest from "../components/VehicleSuggest";
+import ConfirmPanel from "../components/ConfirmPanel";
+import DriverLook from "../components/DriverLook";
+import WaitDriver from "../components/WaitDriver";
+
+const Home = () => {
+  const [panelOpen, setPanelOpen] = useState(false);
+  const [vehiclePanel, setVehiclePanel] = useState(false);
+  const [confirmPanel, setConfirmPanel] = useState(false);
+  const [vehicleFound, setVehicleFound] = useState(false);
+  const [waitDriver, setWaitDriver] = useState(false);
+
+  return (
+    <div className="h-screen relative">
+      <LocationSearchPanel
+        setPanelOpen={setPanelOpen}
+        setVehiclePanel={setVehiclePanel}
+      />
+      <VehicleSuggest
+        setConfirmPanel={setConfirmPanel}
+        setVehiclePanel={setVehiclePanel}
+      />
+      <ConfirmPanel
+        setConfirmPanel={setConfirmPanel}
+        setVehicleFound={setVehicleFound}
+      />
+      <DriverLook setVehicleFound={setVehicleFound} />
+      <WaitDriver setWaitDriver={setWaitDriver} />
+    </div>
+  );
+};
+
+export default Home;
+```
+
+#### Notes
+
+- **GSAP Animations**: The `Home` page uses GSAP animations to handle smooth transitions between panels.
+- **Form Handling**: The `react-hook-form` library is used for managing form inputs for pickup location and destination.
+- **Styling**: Tailwind CSS is used for styling all components.
+
+---
+
 ## Captain Components
 
 ### Captain Registration
