@@ -8,10 +8,12 @@ import UserSign from './pages/UserSign'
 import Start from './pages/Start'
 import { Toaster } from 'sonner';
 import UserProtectWrapper from './protect/UserProtectWrapper'
+import CaptainProtectWrapper from './protect/CaptainProtectWrapper'
 import UserLogout from './pages/UserLogout'
 import CaptainsHome from './pages/CaptainsHome'
 import CaptainLogout from './pages/CaptainLogout'
 import Riding from './pages/Riding'
+import CaptainRiding from './pages/CaptainRiding'
 
 const App = () => {
   return (
@@ -39,10 +41,13 @@ const App = () => {
 
 
         <Route path="/captains/home" element={
-          <UserProtectWrapper><CaptainsHome /></UserProtectWrapper>} />
+          <CaptainProtectWrapper><CaptainsHome /></CaptainProtectWrapper>} />
 
         <Route path="/captains/logout" element={
-          <UserProtectWrapper><CaptainLogout /></UserProtectWrapper>} />
+          <CaptainProtectWrapper><CaptainLogout /></CaptainProtectWrapper>} />
+
+        <Route path="/captains/ride" element={
+          <CaptainProtectWrapper><CaptainRiding /></CaptainProtectWrapper>} />
       </Routes>
 
     </>

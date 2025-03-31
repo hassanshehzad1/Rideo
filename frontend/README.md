@@ -479,3 +479,362 @@ Content-Type: application/json
 - Ensure that the backend API endpoints are correctly configured in the `.env` file.
 - Use `localStorage` for token and user/captain data management.
 - Tailwind CSS is used for styling components.
+
+# Captain Frontend Documentation
+
+This section provides a comprehensive guide to the Captain's frontend in the Rideo application. It includes examples, API responses, and a detailed explanation of how each component and page works.
+
+---
+
+## Overview
+
+The Captain's frontend is designed to allow captains to register, log in, manage rides, and view their earnings. It integrates multiple components and uses `react-router-dom` for navigation, `react-hook-form` for form handling, and `GSAP` for animations.
+
+---
+
+## Table of Contents
+
+1. [Captain Components](#captain-components)
+   - [ConfirmPanel](#confirmpanel)
+   - [ConfirmPopup](#confirmpopup)
+   - [RidePopup](#ridepopup)
+   - [FinishPanel](#finishpanel)
+2. [Captain Pages](#captain-pages)
+   - [Captain Registration](#captain-registration)
+   - [Captain Login](#captain-login)
+   - [Captain Home](#captain-home)
+   - [Captain Riding](#captain-riding)
+   - [Captain Logout](#captain-logout)
+3. [API Examples and Responses](#api-examples-and-responses)
+4. [How It Works](#how-it-works)
+5. [Screenshots and UI Examples](#screenshots-and-ui-examples)
+
+---
+
+## Captain Components
+
+### ConfirmPanel
+
+- **File**: `src/components/ConfirmPanel.jsx`
+- **Description**: Allows users to confirm their ride selection.
+- **Props**:
+  - `setConfirmPanel`: Function to toggle the panel visibility.
+  - `setVehicleFound`: Function to indicate that a vehicle has been found.
+- **Example Usage**:
+  ```jsx
+  <ConfirmPanel
+    setConfirmPanel={setConfirmPanel}
+    setVehicleFound={setVehicleFound}
+  />
+  ```
+
+---
+
+### ConfirmPopup
+
+- **File**: `src/components/ConfirmPopup.jsx`
+- **Description**: Displays a popup for captains to confirm a ride.
+- **Props**:
+  - `setConfirmPopupPanel`: Function to toggle the popup visibility.
+- **Example Usage**:
+  ```jsx
+  <ConfirmPopup setConfirmPopupPanel={setConfirmPopupPanel} />
+  ```
+
+---
+
+### RidePopup
+
+- **File**: `src/components/RidePopup.jsx`
+- **Description**: Displays a popup with new ride requests for captains to accept or decline.
+- **Props**:
+  - `setPopupPanel`: Function to toggle the popup visibility.
+  - `setConfirmPopupPanel`: Function to toggle the confirm popup visibility.
+- **Example Usage**:
+  ```jsx
+  <RidePopup
+    setPopupPanel={setPopupPanel}
+    setConfirmPopupPanel={setConfirmPopupPanel}
+  />
+  ```
+
+---
+
+### FinishPanel
+
+- **File**: `src/pages/FinishPanel.jsx`
+- **Description**: Allows captains to mark a ride as completed.
+- **Props**:
+  - `setFinishPanel`: Function to toggle the finish panel visibility.
+- **Example Usage**:
+  ```jsx
+  <FinishPanel setFinishPanel={setFinishPanel} />
+  ```
+
+---
+
+## Captain Pages
+
+### Captain Registration
+
+- **File**: `src/pages/CaptainSign.jsx`
+- **Description**: Allows captains to register by providing personal and vehicle details.
+- **Validation**:
+  - First Name: Required, minimum 2 characters.
+  - Last Name: Required, minimum 2 characters.
+  - Email: Required, must be a valid email format.
+  - Password: Required, minimum 8 characters.
+  - Vehicle Details: Required fields include type, license plate, model, color, and capacity.
+- **API Endpoint**: `POST /api/v1/captains/register`
+- **Post-Action**:
+  - Stores captain data and token in local storage.
+  - Redirects to the captain home page.
+
+---
+
+### Captain Login
+
+- **File**: `src/pages/CaptainLogin.jsx`
+- **Description**: Allows captains to log in using their email and password.
+- **Validation**:
+  - Email: Required, must be a valid email format.
+  - Password: Required, minimum 8 characters.
+- **API Endpoint**: `POST /api/v1/captains/login`
+- **Post-Action**:
+  - Stores captain data and token in local storage.
+  - Redirects to the captain home page.
+
+---
+
+### Captain Home
+
+- **File**: `src/pages/CaptainsHome.jsx`
+- **Description**: Displays the captain dashboard with details like earnings, hours online, and ride requests.
+- **Components**:
+  - **CaptainsDetails**: Displays captain's earnings and hours online.
+  - **RidePopup**: Shows new ride requests with options to accept or decline.
+  - **ConfirmPopup**: Confirms the ride after acceptance.
+- **Animations**: Uses GSAP for smooth transitions between panels.
+
+---
+
+### Captain Riding
+
+- **File**: `src/pages/CaptainRiding.jsx`
+- **Description**: Displays the ongoing ride details, including distance and a button to complete the ride.
+- **Components**:
+  - **FinishPanel**: Allows the captain to mark the ride as completed.
+- **Animations**: Uses GSAP for panel transitions.
+
+---
+
+### Captain Logout
+
+- **File**: `src/pages/CaptainLogout.jsx`
+- **Description**: Logs out the captain by clearing local storage and context data.
+- **API Endpoint**: `GET /api/v1/captains/logout`
+- **Post-Action**:
+  - Clears captain data and token from local storage.
+  - Redirects to the captain login page.
+
+---
+
+## API Examples and Responses
+
+### Captain Registration Example
+
+**Request:**
+
+```json
+POST /api/v1/captains/register
+Content-Type: application/json
+
+{
+  "fullName": {
+    "firstName": "Jane",
+    "lastName": "Smith"
+  },
+  "email": "jane.smith@example.com",
+  "password": "securepassword",
+  "vehicle": {
+    "type": "car",
+    "licensePlate": "ABC123",
+    "model": "Toyota Corolla",
+    "color": "Blue",
+    "capacity": 4
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Captain registered successfully",
+  "captain": {
+    "id": "67890",
+    "fullName": {
+      "firstName": "Jane",
+      "lastName": "Smith"
+    },
+    "email": "jane.smith@example.com",
+    "vehicle": {
+      "type": "car",
+      "licensePlate": "ABC123",
+      "model": "Toyota Corolla",
+      "color": "Blue",
+      "capacity": 4
+    }
+  },
+  "token": "jwt-token-here"
+}
+```
+
+---
+
+### Captain Login Example
+
+**Request:**
+
+```json
+POST /api/v1/captains/login
+Content-Type: application/json
+
+{
+  "email": "jane.smith@example.com",
+  "password": "securepassword"
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Login successful",
+  "captain": {
+    "id": "67890",
+    "fullName": {
+      "firstName": "Jane",
+      "lastName": "Smith"
+    },
+    "email": "jane.smith@example.com",
+    "vehicle": {
+      "type": "car",
+      "licensePlate": "ABC123",
+      "model": "Toyota Corolla",
+      "color": "Blue",
+      "capacity": 4
+    }
+  },
+  "token": "jwt-token-here"
+}
+```
+
+---
+
+### Ride Completion Example
+
+**Request:**
+
+```json
+POST /api/v1/rides/complete
+Content-Type: application/json
+
+{
+  "rideId": "12345",
+  "status": "completed"
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Ride completed successfully",
+  "ride": {
+    "id": "12345",
+    "status": "completed",
+    "distance": "10.5 KM",
+    "fare": "$25.00"
+  }
+}
+```
+
+---
+
+## How It Works
+
+1. **Registration**:
+
+   - Captains register by providing personal and vehicle details.
+   - The backend validates the data and returns a token upon success.
+
+2. **Login**:
+
+   - Captains log in using their email and password.
+   - The backend authenticates the credentials and returns a token.
+
+3. **Dashboard**:
+
+   - Captains view their earnings, hours online, and ride requests.
+   - Ride requests are displayed in a popup with options to accept or decline.
+
+4. **Ride Management**:
+
+   - After accepting a ride, captains can view ride details and mark the ride as completed.
+
+5. **Logout**:
+   - Captains log out, clearing their session and redirecting to the login page.
+
+---
+
+## Screenshots and UI Examples
+
+### Captain Registration Page
+
+- **Description**: A form for captains to register with personal and vehicle details.
+- **Example**:
+  ![Captain Registration](https://via.placeholder.com/600x400)
+
+---
+
+### Captain Login Page
+
+- **Description**: A form for captains to log in using their email and password.
+- **Example**:
+  ![Captain Login](https://via.placeholder.com/600x400)
+
+---
+
+### Captain Dashboard
+
+- **Description**: Displays earnings, hours online, and ride requests.
+- **Example**:
+  ![Captain Dashboard](https://via.placeholder.com/600x400)
+
+---
+
+### Ride Popup
+
+- **Description**: Shows new ride requests with options to accept or decline.
+- **Example**:
+  ![Ride Popup](https://via.placeholder.com/600x400)
+
+---
+
+### Ride Completion
+
+- **Description**: Allows captains to mark a ride as completed.
+- **Example**:
+  ![Ride Completion](https://via.placeholder.com/600x400)
+
+---
+
+## Notes
+
+- Ensure the backend API endpoints are correctly configured in the `.env` file.
+- Use `localStorage` for token and captain data management.
+- Tailwind CSS is used for styling all components.

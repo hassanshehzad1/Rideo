@@ -67,7 +67,7 @@ const CaptainLogin = () => {
 
                     <button
                         type="submit"
-                        className="flex items-center justify-center w-full bg-[#f13a28] text-white py-3 rounded cursor-pointer hover:bg-[#d32f2f] transition-colors mt-7"
+                        className="flex items-center justify-center w-full bg-yellow-500 text-black py-3 rounded cursor-pointer hover:bg-yellow-600 transition-colors mt-7"
                     >
                         Start your journey
                     </button>
@@ -81,7 +81,7 @@ const CaptainLogin = () => {
                 </p>
             </div>
             <div>
-                <Link to="/users/login" className="flex items-center justify-center w-full bg-[#1248c7] text-white py-3 rounded cursor-pointer hover:bg-[#1248c9] transition-colors mt-7">
+                <Link to="/users/login" className="flex items-center justify-center w-full bg-orange-600 text-white py-3 rounded cursor-pointer hover:bg-orange-700 transition-colors mt-7">
                     Sign in as user
                 </Link>
             </div>

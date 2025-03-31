@@ -42,7 +42,7 @@ const Riding = () => {
 
                     </div>
                 </div>
-                <button className='w-full  mt-2 cursor-pointer bg-red-900 text-white font-semibold p-2 rounded-full'>Make a Payment</button>
+                <button className='w-full  mt-2 cursor-pointer bg-red-900 text-white font-semibold p-2 rounded-lg'>Make a Payment</button>
             </div>
         </div>
     )
