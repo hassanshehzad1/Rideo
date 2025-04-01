@@ -689,3 +689,212 @@ router.get("/profile", captainProtect, profile);
 
 - Ensure the `JWT_SECRET` environment variable is set in the `.env` file.
 - Tokens are blacklisted upon logout to prevent reuse.
+
+# Maps Endpoints
+
+## Endpoint: `/api/v1/maps/get-coordinate`
+
+### Description
+
+Fetches the geographical coordinates (latitude and longitude) for a given address.
+
+### Method
+
+`GET`
+
+### Query Parameters
+
+| Parameter | Type   | Required | Description                           |
+| --------- | ------ | -------- | ------------------------------------- |
+| `address` | String | Yes      | The address to fetch coordinates for. |
+
+### Example Request
+
+```http
+GET /api/v1/maps/get-coordinate?address=1600+Amphitheatre+Parkway HTTP/1.1
+Authorization: Bearer <token>
+```
+
+### Example Response
+
+```json
+{
+  "success": true,
+  "message": "Coordinates fetched successfully",
+  "data": {
+    "lat": 37.422,
+    "lng": -122.084
+  }
+}
+```
+
+---
+
+## Endpoint: `/api/v1/maps/get-distance-time`
+
+### Description
+
+Calculates the distance and estimated travel time between two locations.
+
+### Method
+
+`GET`
+
+### Query Parameters
+
+| Parameter     | Type   | Required | Description                       |
+| ------------- | ------ | -------- | --------------------------------- |
+| `origin`      | String | Yes      | The starting location address.    |
+| `destination` | String | Yes      | The destination location address. |
+
+### Example Request
+
+```http
+GET /api/v1/maps/get-distance-time?origin=New+York&destination=Boston HTTP/1.1
+Authorization: Bearer <token>
+```
+
+### Example Response
+
+```json
+{
+  "success": true,
+  "message": "Distance and time calculated successfully",
+  "data": {
+    "distance": {
+      "text": "305.5 km",
+      "value": 305500
+    },
+    "duration": {
+      "text": "3 hours 45 mins",
+      "value": 13500
+    },
+    "status": "OK"
+  }
+}
+```
+
+---
+
+## Endpoint: `/api/v1/maps/get-suggestion`
+
+### Description
+
+Provides autocomplete suggestions for a given input string.
+
+### Method
+
+`GET`
+
+### Query Parameters
+
+| Parameter | Type   | Required | Description                       |
+| --------- | ------ | -------- | --------------------------------- |
+| `input`   | String | Yes      | The input string for suggestions. |
+
+### Example Request
+
+```http
+GET /api/v1/maps/get-suggestion?input=1600 HTTP/1.1
+Authorization: Bearer <token>
+```
+
+### Example Response
+
+```json
+[
+  {
+    "description": "1600 Amphitheatre Parkway, Mountain View, CA, USA",
+    "place_id": "12345",
+    "structured_formatting": {
+      "main_text": "1600 Amphitheatre Parkway",
+      "secondary_text": "Mountain View, CA, USA"
+    },
+    "terms": [
+      { "offset": 0, "value": "1600 Amphitheatre Parkway" },
+      { "offset": 27, "value": "Mountain View" },
+      { "offset": 42, "value": "CA" },
+      { "offset": 46, "value": "USA" }
+    ]
+  }
+]
+```
+
+---
+
+# Rides Endpoints
+
+## Endpoint: `/api/v1/rides/create`
+
+### Description
+
+Creates a new ride request.
+
+### Method
+
+`POST`
+
+### Request Body
+
+| Field         | Type   | Required | Description                                  |
+| ------------- | ------ | -------- | -------------------------------------------- |
+| `pickup`      | String | Yes      | The pickup location address.                 |
+| `destination` | String | Yes      | The destination location address.            |
+| `vehicleType` | String | Yes      | The type of vehicle (`auto`, `car`, `bike`). |
+
+### Example Request
+
+```http
+POST /api/v1/rides/create HTTP/1.1
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "pickup": "1600 Amphitheatre Parkway",
+  "destination": "1 Infinite Loop",
+  "vehicleType": "car"
+}
+```
+
+### Example Response
+
+```json
+{
+  "user": "64f1a2b3c4d5e6f7g8h9i0j1",
+  "pickup": "1600 Amphitheatre Parkway",
+  "destination": "1 Infinite Loop",
+  "fare": 150.75,
+  "otp": "123456",
+  "status": "pending",
+  "duration": 3600,
+  "distance": 50000,
+  "_id": "64f1a2b3c4d5e6f7g8h9i0j2",
+  "createdAt": "2023-10-01T12:00:00.000Z",
+  "updatedAt": "2023-10-01T12:00:00.000Z"
+}
+```
+
+## Ride Model Example
+
+The following is an example of the `Ride` model:
+
+```json
+{
+  "user": "64f1a2b3c4d5e6f7g8h9i0j1",
+  "captain": "64f1a2b3c4d5e6f7g8h9i0j2",
+  "pickup": "1600 Amphitheatre Parkway",
+  "destination": "1 Infinite Loop",
+  "fare": 150.75,
+  "status": "pending",
+  "duration": 3600,
+  "distance": 50000,
+  "paymentId": "pay_123456789",
+  "orderId": "order_987654321",
+  "signature": "signature_abcdef",
+  "otp": "123456",
+  "createdAt": "2023-10-01T12:00:00.000Z",
+  "updatedAt": "2023-10-01T12:00:00.000Z"
+}
+```
+
+---
