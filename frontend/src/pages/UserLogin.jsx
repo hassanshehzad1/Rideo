@@ -17,7 +17,7 @@ const UserLogin = () => {
 
             if (res?.data?.success) {
                 toast.success(res?.data?.message);
-                setUser(res?.data?.user);
+                setUser(res?.data.user);
                 localStorage.setItem("token", res?.data?.token); // Store token in local storage
                 localStorage.setItem("user", JSON.stringify(res?.data?.user)); // Store user data in local storage
                 navigate("/home"); // Redirect to home page after successful login

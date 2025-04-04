@@ -4,11 +4,15 @@ import logo from "../assets/Images/logo.png"
 import { useGSAP } from '@gsap/react';
 import gsap from "gsap"
 import FinishPanel from './FinishPanel';
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 const CaptainRiding = () => {
 
     const [finishPanel, setFinishPanel] = useState(false);
     const finishPanelRef = useRef(null);
+    const location  =  useLocation();
+    console.log(location)
+    const rideData = location.state?.ride
+
 
     useGSAP(() => {
 
@@ -45,7 +49,7 @@ const CaptainRiding = () => {
                 <button className="bg-gray-400 text-white font-semibold p-3 px-10 rounded-lg">Complete ride</button>
             </div>
             <div ref={finishPanelRef} className="fixed w-full h-screen z-10 bottom-0 translate-y-full bg-white px-3 py-6 pt-12">
-                <FinishPanel setFinishPanel={setFinishPanel} />
+                <FinishPanel ride={rideData} setFinishPanel={setFinishPanel} />
             </div>
 
 

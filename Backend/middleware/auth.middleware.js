@@ -63,8 +63,8 @@ export const captainProtect = async (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         // Fetch user
-        req.user = await CaptainModel.findById(decoded._id).select("-password");
-        if (!req.user) return res.status(401).json({ message: "Not authorized, token not found" })
+        req.captain = await CaptainModel.findById(decoded._id).select("-password");
+        if (!req.captain) return res.status(401).json({ message: "Not authorized, token not found" })
         next();
     } catch (err) {
         console.error(err.message);

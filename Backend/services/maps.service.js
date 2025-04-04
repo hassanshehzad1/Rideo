@@ -1,4 +1,5 @@
 import axios from "axios";
+import CaptainModel from "../models/caption.model.js";
 
 // Function to convert seconds to a human-readable duration string
 const formatDuration = (seconds) => {
@@ -131,14 +132,14 @@ export const getSuggestionService = async (input) => {
             throw new Error("Geoapify API key is missing in environment variables");
         }
 
-        const url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(input)}&apiKey=${API_KEY}&limit=5`;
+        const url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${input}re&apiKey=${API_KEY}&limit=3`;
         const response = await axios.get(url);
 
-      
+
         if (response.data && response.data.features && response.data.features.length > 0) {
             const suggestions = response.data.features.map(feature => {
                 const fullAddress = feature.properties.formatted;
-               
+
                 const termsArray = fullAddress.split(", ");
                 let currentOffset = 0;
                 const terms = termsArray.map(term => {
@@ -173,3 +174,18 @@ export const getSuggestionService = async (input) => {
         throw error;
     }
 };
+
+
+// !Get captain in radius
+export const getCaptainInRadius = async (ltd, lng, radius) => {
+    // Radius in km
+    const captains = await CaptainModel.find({
+        location: {
+            $geoWithin: {
+                $centerSphere: [[lng, ltd], radius / 6371]
+            }
+        }
+    })
+
+    return captains;
+}

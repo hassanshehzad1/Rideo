@@ -76,16 +76,17 @@ export const getSuggestion = async (req, res) => {
             errors: errors.array()
         })
     }
-    
+    const { input } = req.query;
+
     try {
-        const result = await getSuggestionService(req);
+        const result = await getSuggestionService(input);
         return res.status(200).json(result);
     }
     catch (err) {
-        console.error(err);
+        console.error(err?.message);
         return res.status(400).json({
             message: "Error",
-            errors: err
+            errors: err?.message
         })
     }
 }

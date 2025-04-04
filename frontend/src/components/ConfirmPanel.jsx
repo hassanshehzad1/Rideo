@@ -15,30 +15,29 @@ const ConfirmPanel = (props) => {
                     <div className="flex items-center gap-5 p-3 border-b-2 border-gray-100">
                         <i className='ri-map-pin-user-fill'></i>
                         <div>
-                            <h3 className='text-lg font-medium'>562/11-A</h3>
-                            <p className='text-sm -mt-1 text-gray-600'>Kankariya, talab, Bhopal</p>
+                            <h3 className='text-lg font-medium'>Terminal</h3>
+                            <p className='text-md -mt-1 text-gray-600'>{props.routes.pickupLocation}</p>
                         </div>
 
                     </div>
                     <div className="flex items-center gap-5 p-3 border-b-2 border-gray-100">
                         <i className='ri-map-pin-user-fill'></i>
                         <div>
-                            <h3 className='text-lg font-medium'>562/11-A</h3>
-                            <p className='text-sm -mt-1 text-gray-600'>Kankariya, talab, Bhopal</p>
+                            <h3 className='text-lg font-medium'>Destination</h3>
+                            <p className='text-md -mt-1 text-gray-600'>{props.routes.destination}</p>
                         </div>
 
                     </div>
                     <div className="flex items-center gap-5 p-3 border-b-2 border-gray-100">
                         <i className='ri-map-pin-user-fill'></i>
                         <div>
-                            <h3 className='text-lg font-medium'>562/11-A</h3>
-                            <p className='text-sm -mt-1 text-gray-600'>Kankariya, talab, Bhopal</p>
+                            <h3 className='text-lg font-medium'>Cost</h3>
+                            <p className='text-md -mt-1 text-gray-600'>{props?.fare[props.vehicleType]} Pkr</p>
                         </div>
 
                     </div>
                     <button className='w-full  mt-2 cursor-pointer bg-red-900 text-white font-semibold p-2 rounded-lg' onClick={() => {
-                        props.setVehicleFound(true)
-                        props.setConfirmPanel(false)
+                        props.createRide()
                     }}>Confirm</button>
 
                 </div>

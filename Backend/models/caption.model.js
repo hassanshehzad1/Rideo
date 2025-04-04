@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+
 const captainSchema = new mongoose.Schema({
     fullName: {
         firstName: {
@@ -13,7 +14,7 @@ const captainSchema = new mongoose.Schema({
             type: String,
             required: true,
             trim: true,
-            minLength: [3, "last name should be at least 3 characters long"],
+            minLength: [3, "Last name should be at least 3 characters long"],
         }
     },
     email: {
@@ -22,8 +23,7 @@ const captainSchema = new mongoose.Schema({
         unique: true,
         trim: true,
         lowercase: true,
-        pattern: [/^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/, "Please enter a valid email"]
-
+        match: [/^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/, "Please enter a valid email"]
     },
     password: {
         type: String,
@@ -34,13 +34,11 @@ const captainSchema = new mongoose.Schema({
     socketId: {
         type: String
     },
-
     vehicle: {
         type: {
             type: String,
             required: [true, "Please enter a vehicle type"],
             enum: ["car", "bike", "auto"],
-
         },
         licensePlate: {
             type: String,
@@ -61,11 +59,8 @@ const captainSchema = new mongoose.Schema({
             type: Number,
             required: true,
             default: 1,
-            minLength: [1, "Capacity should be at least 1"]
-
+            min: [1, "Capacity should be at least 1"] // minLength nahi, min use karo
         }
-
-
     },
     status: {
         type: String,
@@ -74,19 +69,19 @@ const captainSchema = new mongoose.Schema({
         required: true,
     },
     location: {
-        lat: {
-            type: Number,
+        type: {
+            type: String,
+            enum: ["Point"],
+            default: "Point"
         },
-        lon: {
-            type: Number
+        coordinates: {
+            type: [Number], // [longitude, latitude]
+            required: true
         }
     }
-
-
 }, {
     timestamps: true
 });
-
 
 // Hashing password
 captainSchema.pre("save", async function (next) {
@@ -97,18 +92,18 @@ captainSchema.pre("save", async function (next) {
     next();
 });
 
-
 // Compare password
 captainSchema.methods.comparePassword = async function (password) {
     return await bcrypt.compare(password, this.password);
-}
-
+};
 
 // Generate token
 captainSchema.methods.generateToken = function () {
     return jwt.sign({ _id: this._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
-}
+};
 
+// 2dsphere Index for geospatial queries
+captainSchema.index({ location: "2dsphere" });
 
 const CaptainModel = mongoose.model("Captain", captainSchema);
 export default CaptainModel;
