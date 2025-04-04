@@ -898,3 +898,317 @@ The following is an example of the `Ride` model:
 ```
 
 ---
+
+## Socket Events Documentation
+
+### Event: `join`
+
+#### Description
+
+This event is used to associate a user or captain with their socket ID.
+
+#### Payload
+
+| Field      | Type   | Required | Description                             |
+| ---------- | ------ | -------- | --------------------------------------- |
+| `userId`   | String | Yes      | The ID of the user or captain.          |
+| `userType` | String | Yes      | The type of user (`user` or `captain`). |
+
+#### Example
+
+```json
+{
+  "userId": "64f1a2b3c4d5e6f7g8h9i0j1",
+  "userType": "user"
+}
+```
+
+---
+
+### Event: `updateLocation`
+
+#### Description
+
+This event is used by captains to update their current location.
+
+#### Payload
+
+| Field      | Type   | Required | Description                                 |
+| ---------- | ------ | -------- | ------------------------------------------- |
+| `userId`   | String | Yes      | The ID of the captain.                      |
+| `location` | Object | Yes      | The location object containing coordinates. |
+
+#### Example
+
+```json
+{
+  "userId": "64f1a2b3c4d5e6f7g8h9i0j2",
+  "location": {
+    "type": "Point",
+    "coordinates": [77.5946, 12.9716]
+  }
+}
+```
+
+---
+
+### Event: `newRideRequest`
+
+#### Description
+
+This event is emitted to captains within a 5 km radius when a new ride request is created.
+
+#### Example Payload
+
+```json
+{
+  "event": "newRideRequest",
+  "ride": {
+    "user": {
+      "id": "64f1a2b3c4d5e6f7g8h9i0j1",
+      "email": "john.doe@example.com",
+      "fullName": {
+        "firstName": "John",
+        "lastName": "Doe"
+      }
+    },
+    "pickup": "1600 Amphitheatre Parkway",
+    "destination": "1 Infinite Loop",
+    "fare": 150.75,
+    "status": "pending"
+  }
+}
+```
+
+---
+
+### Event: `rideConfirmed`
+
+#### Description
+
+This event is emitted to the user when a captain confirms their ride.
+
+#### Example Payload
+
+```json
+{
+  "event": "rideConfirmed",
+  "ride": {
+    "id": "64f1a2b3c4d5e6f7g8h9i0j2",
+    "captain": {
+      "id": "64f1a2b3c4d5e6f7g8h9i0j3",
+      "fullName": {
+        "firstName": "Jane",
+        "lastName": "Doe"
+      }
+    },
+    "status": "accepted"
+  }
+}
+```
+
+---
+
+### Event: `rideStarted`
+
+#### Description
+
+This event is emitted to the user when the ride starts.
+
+#### Example Payload
+
+```json
+{
+  "event": "rideStarted",
+  "ride": {
+    "id": "64f1a2b3c4d5e6f7g8h9i0j2",
+    "status": "ongoing"
+  }
+}
+```
+
+---
+
+### Event: `rideEnd`
+
+#### Description
+
+This event is emitted to the user when the ride ends.
+
+#### Example Payload
+
+```json
+{
+  "event": "rideEnd",
+  "ride": {
+    "id": "64f1a2b3c4d5e6f7g8h9i0j2",
+    "status": "completed"
+  }
+}
+```
+
+---
+
+## Ride Services Documentation
+
+### Service: `createRide`
+
+#### Description
+
+Creates a new ride request.
+
+#### Endpoint
+
+`POST /api/v1/rides/create`
+
+#### Request Body
+
+| Field         | Type   | Required | Description                                  |
+| ------------- | ------ | -------- | -------------------------------------------- |
+| `pickup`      | String | Yes      | The pickup location address.                 |
+| `destination` | String | Yes      | The destination location address.            |
+| `vehicleType` | String | Yes      | The type of vehicle (`auto`, `car`, `bike`). |
+
+#### Example Request
+
+```json
+{
+  "pickup": "1600 Amphitheatre Parkway",
+  "destination": "1 Infinite Loop",
+  "vehicleType": "car"
+}
+```
+
+#### Example Response
+
+```json
+{
+  "user": "64f1a2b3c4d5e6f7g8h9i0j1",
+  "pickup": "1600 Amphitheatre Parkway",
+  "destination": "1 Infinite Loop",
+  "fare": 150.75,
+  "otp": "123456",
+  "status": "pending",
+  "duration": 3600,
+  "distance": 50000,
+  "_id": "64f1a2b3c4d5e6f7g8h9i0j2",
+  "createdAt": "2023-10-01T12:00:00.000Z",
+  "updatedAt": "2023-10-01T12:00:00.000Z"
+}
+```
+
+---
+
+### Service: `confirmRide`
+
+#### Description
+
+Confirms a ride request by a captain.
+
+#### Endpoint
+
+`POST /api/v1/rides/confirm-ride`
+
+#### Request Body
+
+| Field    | Type   | Required | Description         |
+| -------- | ------ | -------- | ------------------- |
+| `rideId` | String | Yes      | The ID of the ride. |
+
+#### Example Request
+
+```json
+{
+  "rideId": "64f1a2b3c4d5e6f7g8h9i0j2"
+}
+```
+
+#### Example Response
+
+```json
+{
+  "id": "64f1a2b3c4d5e6f7g8h9i0j2",
+  "captain": {
+    "id": "64f1a2b3c4d5e6f7g8h9i0j3",
+    "fullName": {
+      "firstName": "Jane",
+      "lastName": "Doe"
+    }
+  },
+  "status": "accepted"
+}
+```
+
+---
+
+### Service: `startRide`
+
+#### Description
+
+Starts a ride after OTP verification.
+
+#### Endpoint
+
+`PUT /api/v1/rides/start-ride`
+
+#### Request Body
+
+| Field    | Type   | Required | Description           |
+| -------- | ------ | -------- | --------------------- |
+| `rideId` | String | Yes      | The ID of the ride.   |
+| `otp`    | String | Yes      | The OTP for the ride. |
+
+#### Example Request
+
+```json
+{
+  "rideId": "64f1a2b3c4d5e6f7g8h9i0j2",
+  "otp": "123456"
+}
+```
+
+#### Example Response
+
+```json
+{
+  "id": "64f1a2b3c4d5e6f7g8h9i0j2",
+  "status": "ongoing"
+}
+```
+
+---
+
+### Service: `endRide`
+
+#### Description
+
+Ends an ongoing ride.
+
+#### Endpoint
+
+`PUT /api/v1/rides/end-ride`
+
+#### Request Body
+
+| Field    | Type   | Required | Description         |
+| -------- | ------ | -------- | ------------------- |
+| `rideId` | String | Yes      | The ID of the ride. |
+
+#### Example Request
+
+```json
+{
+  "rideId": "64f1a2b3c4d5e6f7g8h9i0j2"
+}
+```
+
+#### Example Response
+
+```json
+{
+  "id": "64f1a2b3c4d5e6f7g8h9i0j2",
+  "status": "completed"
+}
+```
+
+---
