@@ -1,33 +1,35 @@
-import React, { createContext, useEffect } from 'react'
+import React, { createContext, useEffect } from 'react';
 import io from "socket.io-client";
+
 export const SocketContext = createContext();
-const socket = io(`${import.meta.env.VITE_BACKEND_URL}`);
+const socket = io("http://localhost:3000", {
+    reconnection: true,
+    reconnectionAttempts: Infinity,
+    reconnectionDelay: 1000,
+    transports: ["websocket"],
+});
 
 const SocketProvider = ({ children }) => {
-
     useEffect(() => {
         socket.on("connect", () => {
-            console.log("connected to server")
-        })
+            console.log("Connected to server, socket ID:", socket.id);
+        });
 
         socket.on("disconnect", () => {
-            console.log("Disconnected")
-        })
+            console.log("Disconnected from server");
+        });
 
-
-        // Cleanup on unmount
         return () => {
             socket.off("connect");
             socket.off("disconnect");
         };
-    }, [])
-
+    }, []);
 
     return (
         <SocketContext.Provider value={{ socket }}>
             {children}
         </SocketContext.Provider>
-    )
-}
+    );
+};
 
-export default SocketProvider
+export default SocketProvider;

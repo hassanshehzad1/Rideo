@@ -5,7 +5,6 @@ const LocationSearchPanel = ({  suggestions, onSuggestionSelect }) => {
         <div>
             <h3 className="text-2xl font-semibold mb-5 mt-8">Choose a Location</h3>
 
-            {console.log(suggestions)}
             {suggestions.map((loc, index) =>
             (
                 <div

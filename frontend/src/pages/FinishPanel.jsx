@@ -7,7 +7,7 @@ const navigate = useNavigate();
     const endRide = async () => {
         try {
             const res = await axios.put(`${import.meta.env.VITE_BACKEND_URL}/api/v1/rides/end-ride`, {
-                rideId: props.ride._id
+                ride: props.ride
             }, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`

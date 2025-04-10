@@ -1,0 +1,22 @@
+{
+  "name": "rideo-user-service",
+  "version": "1.0.0",
+  "description": "User Microservice for Rideo",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon server.js"
+  },
+  "author": "Hassan Shehzad",
+  "license": "ISC",
+  "dependencies": {
+    "amqplib": "^0.10.7",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-validator": "^7.2.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.13.0"
+  },
+  "type": "module"
+}

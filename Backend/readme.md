@@ -1212,3 +1212,323 @@ Ends an ongoing ride.
 ```
 
 ---
+
+# Microservices Architecture Documentation
+
+## Overview
+
+The Rideo backend has been refactored into a **microservices architecture** to improve scalability, maintainability, and modularity. Each service is responsible for a specific domain and communicates with other services using **REST APIs**, **RabbitMQ** (for asynchronous communication), and **WebSockets** (for real-time updates).
+
+---
+
+## Architecture Diagram
+
+```
++-------------------+       +-------------------+       +-------------------+       +-------------------+
+|   User Service    |       | Captain Service   |       |   Ride Service    |       |    Map Service    |
+|-------------------|       |-------------------|       |-------------------|       |-------------------|
+| - User APIs       |       | - Captain APIs    |       | - Ride APIs       |       | - Map APIs        |
+| - Auth Middleware |       | - Location Update|       | - Ride Matching   |       | - Geolocation     |
+| - JWT Auth        |       | - Socket Updates |       | - Fare Calculation|       | - Distance Matrix |
++-------------------+       +-------------------+       +-------------------+       +-------------------+
+        |                           |                           |                           |
+        |                           |                           |                           |
+        +---------------------------+---------------------------+---------------------------+
+                                    | RabbitMQ (Event Bus) |
+                                    +-----------------------+
+                                            |
+                                    +-----------------------+
+                                    |       WebSocket       |
+                                    +-----------------------+
+```
+
+---
+
+## Microservices Overview
+
+### Services
+
+1. **User Service** (`http://localhost:3001`)
+   - Handles user registration, login, and profile management.
+2. **Captain Service** (`http://localhost:3002`)
+   - Manages captain registration, login, location updates, and ride acceptance.
+3. **Ride Service** (`http://localhost:3003`)
+   - Handles ride creation, ride status updates, and fare calculations.
+4. **Map Service** (`http://localhost:3004`)
+   - Provides geolocation, distance, and route suggestions.
+
+### Communication
+
+- **Synchronous Communication**: REST APIs between services.
+- **Asynchronous Communication**: RabbitMQ for event-driven communication.
+- **Real-Time Communication**: WebSockets for live updates (e.g., location tracking, chat).
+
+---
+
+## RabbitMQ Events
+
+### **1. Event: `rideCreated`**
+
+- **Publisher**: Ride Service
+- **Subscribers**: Captain Service
+- **Payload**:
+  ```json
+  {
+    "rideId": "ride-id",
+    "pickup": "1600 Amphitheatre Parkway",
+    "destination": "1 Infinite Loop",
+    "vehicleType": "car",
+    "fare": 150.75
+  }
+  ```
+
+### **2. Event: `captainAcceptedRide`**
+
+- **Publisher**: Captain Service
+- **Subscribers**: Ride Service
+- **Payload**:
+  ```json
+  {
+    "rideId": "ride-id",
+    "captainId": "captain-id",
+    "status": "accepted"
+  }
+  ```
+
+---
+
+## WebSocket Events
+
+### **1. Event: `join`**
+
+- **Description**: Associates a user or captain with their socket ID.
+- **Payload**:
+  ```json
+  {
+    "userId": "user-id",
+    "userType": "user"
+  }
+  ```
+
+### **2. Event: `updateLocation`**
+
+- **Description**: Updates the captain's location in real-time.
+- **Payload**:
+  ```json
+  {
+    "userId": "captain-id",
+    "location": {
+      "type": "Point",
+      "coordinates": [77.5946, 12.9716]
+    }
+  }
+  ```
+
+### **3. Event: `newRideRequest`**
+
+- **Description**: Notifies captains of a new ride request.
+- **Payload**:
+  ```json
+  {
+    "rideId": "ride-id",
+    "pickup": "1600 Amphitheatre Parkway",
+    "destination": "1 Infinite Loop",
+    "fare": 150.75
+  }
+  ```
+
+---
+
+## API Documentation for Microservices
+
+### **User Service**
+
+#### **1. Register User**
+
+- **Method**: `POST`
+- **Endpoint**: `/api/v1/users/register`
+- **Description**: Registers a new user.
+- **Request Body**:
+  ```json
+  {
+    "fullName": {
+      "firstName": "John",
+      "lastName": "Doe"
+    },
+    "email": "john.doe@example.com",
+    "password": "securepassword123"
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "message": "User created successfully",
+    "success": true,
+    "token": "your-authentication-token"
+  }
+  ```
+
+#### **2. Login User**
+
+- **Method**: `POST`
+- **Endpoint**: `/api/v1/users/login`
+- **Description**: Authenticates a user and returns a JWT token.
+
+---
+
+### **Captain Service**
+
+#### **1. Register Captain**
+
+- **Method**: `POST`
+- **Endpoint**: `/api/v1/captains/register`
+- **Description**: Registers a new captain.
+- **Request Body**:
+  ```json
+  {
+    "fullName": {
+      "firstName": "Jane",
+      "lastName": "Doe"
+    },
+    "email": "jane.doe@example.com",
+    "password": "securepassword123",
+    "vehicle": {
+      "type": "car",
+      "licensePlate": "ABC123",
+      "model": "Toyota Corolla",
+      "color": "Blue",
+      "capacity": 4
+    }
+  }
+  ```
+
+#### **2. Update Location**
+
+- **Method**: `PUT`
+- **Endpoint**: `/update-location/:userId`
+- **Description**: Updates the captain's current location.
+
+---
+
+### **Ride Service**
+
+#### **1. Create Ride**
+
+- **Method**: `POST`
+- **Endpoint**: `/api/v1/rides/create`
+- **Description**: Creates a new ride request.
+- **Request Body**:
+  ```json
+  {
+    "pickup": "1600 Amphitheatre Parkway",
+    "destination": "1 Infinite Loop",
+    "vehicleType": "car"
+  }
+  ```
+
+#### **2. Confirm Ride**
+
+- **Method**: `POST`
+- **Endpoint**: `/confirm-ride`
+- **Description**: Confirms a ride request by a captain.
+
+---
+
+### **Map Service**
+
+#### **1. Get Coordinates**
+
+- **Method**: `GET`
+- **Endpoint**: `/get-coordinate`
+- **Description**: Fetches geographical coordinates for a given address.
+- **Query Parameters**:
+  - `address`: The address to fetch coordinates for.
+- **Example Request**:
+  ```
+  GET /get-coordinate?address=1600+Amphitheatre+Parkway
+  ```
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "message": "Coordinates fetched successfully",
+    "data": {
+      "lat": 37.422,
+      "lng": -122.084
+    }
+  }
+  ```
+
+---
+
+## Folder Structure for Microservices
+
+### **User Service**
+
+```
+User/
+├── .env
+├── app.js
+├── server.js
+├── controllers/
+│   └── user.controller.js
+├── db/
+│   └── conn.js
+├── middleware/
+├── models/
+├── routes/
+├── services/
+```
+
+### **Captain Service**
+
+```
+Captain/
+├── .env
+├── app.js
+├── server.js
+├── controllers/
+│   └── captain.controller.js
+├── db/
+│   └── conn.js
+├── middleware/
+├── models/
+├── routes/
+├── services/
+```
+
+### **Ride Service**
+
+```
+Ride/
+├── .env
+├── app.js
+├── server.js
+├── controllers/
+│   └── ride.controller.js
+├── db/
+│   └── conn.js
+├── middleware/
+├── models/
+├── routes/
+├── services/
+```
+
+### **Map Service**
+
+```
+Maps/
+├── .env
+├── app.js
+├── server.js
+├── controllers/
+│   └── map.controller.js
+├── middleware/
+│   └── auth.middleware.js
+├── routes/
+├── services/
+```
+
+---
+
+This documentation provides a **complete overview of the microservices architecture**, including APIs, RabbitMQ events, WebSocket events, and folder structure. Let me know if you need further details or examples!

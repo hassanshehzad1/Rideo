@@ -54,10 +54,11 @@ const Home = () => {
     if (!user) {
       return "User is not logged in"
     }
-    console.log(user)
+
+    const token = localStorage.getItem("token");
     // Sending message     
-    socket.emit("join", { userId: user._id, userType: "user" })
-    console.log("Hello")
+    socket.emit("join", { userId: user._id, userType: "user", token })
+
     socket.on("rideConfirmed", (ride) => {
       console.log("RideConfirmed", ride);
       setRide(ride);
@@ -183,10 +184,10 @@ const Home = () => {
           Authorization: `Bearer ${localStorage.getItem("token")}`
         }
       });
-      setVehiclePanel(true);
-      setPanelOpen(false);
 
       setFare(res?.data);
+      setVehiclePanel(true);
+      setPanelOpen(false);
 
 
     } catch (err) {
@@ -242,11 +243,11 @@ const Home = () => {
       })
 
 
-      setVehicleFound(true)
-      setConfirmPanel(false)
       toast.success("Ride confirmed");
       console.log(result);
       setRide(result?.data)
+      setVehicleFound(true)
+      setConfirmPanel(false)
     } catch (err) {
       console.error(err)
       console.error(err?.response?.data?.message);
@@ -269,7 +270,7 @@ const Home = () => {
             Find a ride
           </h4>
           <form onSubmit={handleSubmit(onSubmit)} className='mb-3'> {/* Add handleSubmit */}
-            <div className="line absolute h-16 w-1 top-[30%] left-10 bg-gray-800 rounded-full"></div>
+            <div className="line absolute h-16 w-1 top-[33%] left-10 bg-gray-800 rounded-full"></div>
             <input
               {...register("pickupLocation")} // Register pickupLocation
               onClick={() => setPanelOpen(true)}
@@ -301,7 +302,7 @@ const Home = () => {
       </div>
 
       {/* Vehicle panel */}
-      <div ref={vehicleRef} className="fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-10 pt-12">
+      <div ref={vehicleRef} className="fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-6 pt-12">
         <VehicleSuggest setVehicleType={setVehicleType} fare={fare} setConfirmPanel={setConfirmPanel} setVehiclePanel={setVehiclePanel} />
       </div>
       {/* Confirm panel */}
@@ -310,7 +311,7 @@ const Home = () => {
       </div>
 
       {/* Driver Look */}
-      <div ref={vehicleFoundRef} className="fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-6 pt-12 ">
+      <div ref={vehicleFoundRef} className="fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-6 pt-12">
         <DriverLook ride={ride} setVehicleFound={setVehicleFound} />
       </div>
 

@@ -14,7 +14,7 @@ const ConfirmPopup = (props) => {
         try {
 
             const res = await axios.put(`${import.meta.env.VITE_BACKEND_URL}/api/v1/rides/start-ride`, {
-                rideId: props?.ride?._id,
+                ride: props?.ride,
                 otp: otp
             }, {
                 headers: {
@@ -74,10 +74,10 @@ const ConfirmPopup = (props) => {
                             }} className='bg-gray-200 px-6 py-4 font-mono text-lg rounded-lg w-full '
                                 placeholder='Enter  OTP'
                             />
-                            <button type="submit" className='flex text-center items-center justify-center mt-2 cursor-pointer bg-yellow-500 w-full text-white font-semibold p-2 rounded-lg'>Confirm</button>
+                            <button type="submit" className='flex text-center items-center justify-center mt-2 cursor-pointer bg-yellow-500 text-xl w-full text-black font-semibold p-2 rounded-lg'>Start</button>
 
                         </form>
-                        <button className='w-full  mt-2 cursor-pointer bg-gray-600 text-white font-semibold p-2 rounded-lg' onClick={() => {
+                        <button className='w-full text-xl mt-2 cursor-pointer bg-gray-600 text-white font-semibold p-2 rounded-lg' onClick={() => {
                             props.setConfirmPopupPanel(false)
                         }}>Cancel</button>
                     </div>
